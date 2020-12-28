@@ -16,7 +16,7 @@ export default class MainSimulation{
         this.last_t = Date.now() / 1000;
         this.t_accum = 0;
 
-        this.centerPos = [this.width/2, this.height/2];
+        this.updateCanvasSize();
 
         window.addEventListener("mousemove", this.onmousemove.bind(this));
         window.addEventListener("mousedown", this.onmousedown.bind(this));
@@ -27,7 +27,7 @@ export default class MainSimulation{
         window.addEventListener("touchend", this.onmouseup.bind(this),{'passive':false});
         window.addEventListener("touchcancel", this.onmouseup.bind(this),{'passive':false});
 
-        this.objects.push(new DraggableBird(this, this.centerPos));
+        this.objects.push(new DraggableBird(this));
 
         this.update();
     }
@@ -38,6 +38,7 @@ export default class MainSimulation{
         this.canvas.height = this.height = window.innerHeight;
 
         this.centerPos = [this.width/2, this.height/2];
+        this.launcherPos = [this.width/4, this.height/2];
     }
 
 
@@ -58,10 +59,6 @@ export default class MainSimulation{
         let y = event.y;
         for(var i=0;i<this.objects.length;i++){
             this.objects[i].onmousemove(x,y);
-            if(dist([x,y],this.objects[i].pos) < 30){
-                //hover
-                this.objects[i].onhover();
-            }
         }
     }
 
@@ -110,9 +107,10 @@ export default class MainSimulation{
 
         this.objects = this.objects.filter( (x)=>!x.isDead);
 
-        //draw
+        //draw background
         this.updateCanvasSize();
-       // context.fillRect(0,0,this.width,this.height);
+        context.fillStyle = "#EDEFFD";
+        context.fillRect(0,0,this.width,this.height);
 
 
         for(var i=0;i<this.objects.length;i++){

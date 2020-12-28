@@ -4,9 +4,9 @@ import { dist, drawCircle, vecSub, vecScale, drawTriangleInDirection } from './h
 export default class DraggableBird extends GameObject{
     /*
     */
-    constructor(parent, freq, hasHalo=false){
+    constructor(parent){
         super();
-        this.pos = [parent.centerPos[0],parent.centerPos[1]];
+        this.pos = [...parent.launcherPos];
         this.parent = parent;
 
         this.defaultRadius = 25;
@@ -19,9 +19,17 @@ export default class DraggableBird extends GameObject{
 
         this.velocity = [0,0];
 
-        this.gravity = 300;
+        this.gravity = 500;
 
         this.historyPoints = [];
+        
+        this.resetBird();
+    }
+
+    resetBird(){
+        this.pos = [...this.parent.launcherPos];
+        this.mode = "ready";
+        this.velocity = [0,0];
     }
 
     update(dt){
@@ -38,9 +46,7 @@ export default class DraggableBird extends GameObject{
             this.historyPoints.push([...this.pos]);
 
             if(this.pos[1] > this.parent.height){
-                this.pos = [this.parent.centerPos[0],this.parent.centerPos[1]];
-                this.mode = "ready";
-                this.velocity = [0,0];
+                this.resetBird();
             }
 
         }
@@ -50,14 +56,26 @@ export default class DraggableBird extends GameObject{
     draw(context){
 
         if(this.mode == "ready"){
-            this.pos = [this.parent.centerPos[0],this.parent.centerPos[1]];
+            this.pos = [...this.parent.launcherPos];
         }
+
+
+        //draw launcher
+        context.strokeStyle = "#B86800";
+        context.lineWidth = 7;
+        context.beginPath();
+        context.moveTo(this.parent.launcherPos[0] + 25,this.parent.launcherPos[1] - 10);
+        context.lineTo(this.parent.launcherPos[0] + 0,this.parent.launcherPos[1] + 50);
+        context.lineTo(this.parent.launcherPos[0] - 25,this.parent.launcherPos[1] - 10);
+        context.moveTo(this.parent.launcherPos[0] + 0,this.parent.launcherPos[1] + 50);
+        context.lineTo(this.parent.launcherPos[0] + 0,this.parent.launcherPos[1] + 500);
+        context.stroke();
 
         
 
         if(this.mode == "dragging"){
 
-            //arrow from draggable portion to 
+            //arrow from draggable portion to bird
             context.strokeStyle = "#0E1C36";
             context.lineWidth = 4;
             context.beginPath();
@@ -92,8 +110,8 @@ export default class DraggableBird extends GameObject{
         }
         context.stroke();
 
-
-            context.fillStyle = "#0E1C36";
+        //bird itself
+        context.fillStyle = "#0E1C36";
         drawCircle(context, this.pos[0],this.pos[1],this.currentRadius);
   
     }
