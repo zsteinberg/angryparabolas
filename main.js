@@ -38,7 +38,7 @@ export default class MainSimulation{
         this.canvas.height = this.height = window.innerHeight;
 
         this.centerPos = [this.width/2, this.height/2];
-        this.launcherPos = [this.width/4, this.height/2];
+        this.launcherPos = [this.width/3, this.height/2];
     }
 
 

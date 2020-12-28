@@ -139,15 +139,20 @@ export default class DraggableBird extends GameObject{
               this.mode = "dragging";
         }
     }
-    beginFlight(){
-        this.velocity = vecScale(vecSub(this.pos,this.dragPos),1);
-        this.mode = "flight";
-        this.historyPoints = [];
-    }
     onmouseup(x,y){
         this.dragging = false;
         if(this.mode == "dragging"){
             this.beginFlight();
         }
+    }
+    beginFlight(){
+        const maxDraggablePixels = 250;
+        //dragging beyond 250 pixels should do nothing. But a drag of 250 pixels should result in a speed of 500
+        const speed = 2*Math.min(maxDraggablePixels, dist(this.pos,this.dragPos));
+
+        //First, calculate the velocity vector as pos-dragPos, then scale by 1/dist() to normalize it, then set its magnitude to `speed`
+        this.velocity = vecScale(vecSub(this.pos,this.dragPos),speed/dist(this.pos,this.dragPos));
+        this.mode = "flight";
+        this.historyPoints = [];
     }
 }
