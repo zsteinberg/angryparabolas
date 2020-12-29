@@ -1,4 +1,6 @@
 import DraggableBird from './DraggableBird.js';
+import CoordinateSystem from './CoordinateSystem.js';
+import CoordText from './CoordText.js';
 import { dist } from './helperfuncs.js';
 
 export default class MainSimulation{
@@ -11,8 +13,7 @@ export default class MainSimulation{
 
         this.canvas = document.getElementById("canvas");
         this.context = canvas.getContext('2d');
-        this.width = canvas.width;
-        this.height= canvas.height;
+        this.updateCanvasSize();
         this.last_t = Date.now() / 1000;
         this.t_accum = 0;
 
@@ -27,18 +28,32 @@ export default class MainSimulation{
         window.addEventListener("touchend", this.onmouseup.bind(this),{'passive':false});
         window.addEventListener("touchcancel", this.onmouseup.bind(this),{'passive':false});
 
+        this.coordinateSystem = new CoordinateSystem(this);
+        this.objects.push(this.coordinateSystem);
         this.objects.push(new DraggableBird(this));
 
         this.update();
     }
 
+    eraseCoordText(){
+        for(var i=0;i<this.objects.length;i++){
+            if(this.objects[i].constructor === CoordText){
+                this.objects[i].isDead = true;
+            }
+        }
+    }
+
     updateCanvasSize(){
-        //called every frame. also clears the canvas
+        //if we don't need to update, don't
+        if(this.width == this.canvas.width){
+            return;
+        }
         this.canvas.width = this.width = window.innerWidth;
         this.canvas.height = this.height = window.innerHeight;
 
         this.centerPos = [this.width/2, this.height/2];
         this.launcherPos = [this.width/3, this.height/2];
+        this.eraseCoordText();
     }
 
 
@@ -107,8 +122,10 @@ export default class MainSimulation{
 
         this.objects = this.objects.filter( (x)=>!x.isDead);
 
-        //draw background
         this.updateCanvasSize();
+
+        //clear canvas
+        this.canvas.width = this.canvas.width;
         context.fillStyle = "#EDEFFD";
         context.fillRect(0,0,this.width,this.height);
 

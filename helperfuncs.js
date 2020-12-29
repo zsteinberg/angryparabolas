@@ -68,4 +68,4 @@ function drawTriangleInDirection(ctx, pos1, pos2){
 
 }
 
-export { dist, drawCircle, vecSub, vecScale, drawTriangleInDirection };
+export { dist, drawCircle, vecAdd, vecSub, vecScale, drawTriangleInDirection };

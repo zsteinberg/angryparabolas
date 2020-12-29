@@ -1,5 +1,6 @@
 import GameObject from './GameObject.js';
-import { dist, drawCircle, vecSub, vecScale, drawTriangleInDirection } from './helperfuncs.js';
+import CoordText from './CoordText.js';
+import { dist, drawCircle, vecAdd, vecSub, vecScale, drawTriangleInDirection } from './helperfuncs.js';
 
 export default class DraggableBird extends GameObject{
     /*
@@ -36,6 +37,8 @@ export default class DraggableBird extends GameObject{
 
         if(this.mode == "flight"){
 
+            this.addTextIfNeeded(dt);
+
 
             this.pos[0] += this.velocity[0] * dt;
             this.pos[1] += this.velocity[1] * dt;
@@ -48,9 +51,21 @@ export default class DraggableBird extends GameObject{
             if(this.pos[1] > this.parent.height){
                 this.resetBird();
             }
-
+        }
+    }
+    addTextIfNeeded(dt){
+        //vertex of parabola
+        let nextVelocity = this.velocity[1] + this.gravity * dt
+        if(this.velocity[1] < 0 && nextVelocity >= 0){
+            this.parent.objects.push(new CoordText(this.parent, [...this.pos]));
         }
 
+        //place it crosses the x-axis
+        let coords = this.parent.coordinateSystem.pixelToCoordSystem(...this.pos);
+        let nextCoords = this.parent.coordinateSystem.pixelToCoordSystem(...vecAdd(this.pos, vecScale(this.velocity,dt)));
+        if(coords[1] > 0 && nextCoords[1] <= 0){
+            this.parent.objects.push(new CoordText(this.parent, [...this.pos]));
+        }
     }
 
     draw(context){
@@ -137,6 +152,7 @@ export default class DraggableBird extends GameObject{
               this.dragging = true;
               this.dragPos = [x,y];
               this.mode = "dragging";
+
         }
     }
     onmouseup(x,y){
@@ -154,5 +170,10 @@ export default class DraggableBird extends GameObject{
         this.velocity = vecScale(vecSub(this.pos,this.dragPos),speed/dist(this.pos,this.dragPos));
         this.mode = "flight";
         this.historyPoints = [];
+
+        //erase all other coord text
+        this.parent.eraseCoordText();
+        //mark this point as the zero
+        this.parent.objects.push(new CoordText(this.parent, [...this.pos], [-100,0]));
     }
 }
