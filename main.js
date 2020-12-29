@@ -45,14 +45,14 @@ export default class MainSimulation{
 
     updateCanvasSize(){
         //if we don't need to update, don't
-        if(this.width == this.canvas.width){
+        if(this.canvas.width == window.innerWidth){
             return;
         }
         this.canvas.width = this.width = window.innerWidth;
         this.canvas.height = this.height = window.innerHeight;
 
         this.centerPos = [this.width/2, this.height/2];
-        this.launcherPos = [this.width/3, this.height/2];
+        this.launcherPos = [this.width/3, this.height*2/3];
         this.eraseCoordText();
     }
 
